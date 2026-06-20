@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ token.name }} - Confidencial</title>
+    <style>
+        /* Captura resolução da tela silenciosamente */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .fake-doc {
+            background: white;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+        .confidential-stamp {
+            color: #cc0000;
+            border: 3px solid #cc0000;
+            display: inline-block;
+            padding: 10px 30px;
+            transform: rotate(-15deg);
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        .error-icon { font-size: 4em; margin-bottom: 20px; }
+        h1 { color: #333; margin-bottom: 15px; }
+        p { color: #666; line-height: 1.6; }
+        .footer-note { 
+            margin-top: 30px; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee; 
+            font-size: 0.8em; 
+            color: #999; 
+        }
+    </style>
+    <script>
+        // Envia a resolução da tela para o servidor
+        const res = `${window.screen.width}x${window.screen.height}`;
+        const currentUrl = window.location.href;
+        const urlWithRes = currentUrl + (currentUrl.includes('?') ? '&' : '?') + `res=${res}`;
+        
+        // Atualiza a URL sem recarregar para registrar a resolução
+        if (!currentUrl.includes('res=')) {
+            fetch(urlWithRes, { method: 'HEAD' });
+        }
+    </script>
+</head>
+<body>
+    <div class="fake-doc">
+        <div class="error-icon">🔒</div>
+        <div class="confidential-stamp">CONFIDENCIAL</div>
+        <h1>{{ token.name }}</h1>
+        <p>Este documento contém informações confidenciais e de acesso restrito.</p>
+        <p>Se você não tem autorização para acessar este conteúdo, por favor feche esta página imediatamente.</p>
+        <div class="footer-note">
+            <p>Acesso registrado e monitorado • Violação sujeita a medidas disciplinares</p>
+            <p style="font-size: 0.7em; margin-top: 10px;">ID: {{ token.id }}</p>
+        </div>
+    </div>
+    
+    <!-- Pixel de rastreamento invisível (backup) -->
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
+         style="display:none" 
+         onload="console.log('Pixel de rastreamento carregado')" 
+         alt="">
+</body>
+</html>
