@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍯 Honey Token Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍯 Honey Token Tracker</h1>
+            <p class="subtitle">Rastreador de Arquivos Armadilha</p>
+            <nav>
+                <a href="/dashboard" class="btn">📊 Dashboard</a>
+            </nav>
+        </header>
+
+        <section class="create-section">
+            <h2>Criar Novo Token</h2>
+            <form action="/create" method="POST" class="create-form">
+                <input type="text" name="name" placeholder="Nome do token (ex: 'Relatório Confidencial RH')" required>
+                <textarea name="description" placeholder="Descrição (ex: 'PDF falso enviado por email em 15/06')" rows="2"></textarea>
+                <button type="submit" class="btn-primary">🎣 Criar Token Isca</button>
+            </form>
+        </section>
+
+        <section class="tokens-section">
+            <h2>Seus Tokens Ativos</h2>
+            {% if tokens %}
+                <div class="token-grid">
+                    {% for token in tokens %}
+                        <div class="token-card">
+                            <div class="token-header">
+                                <h3>{{ token.name }}</h3>
+                                <span class="token-id">{{ token.id }}</span>
+                            </div>
+                            <p class="token-desc">{{ token.description or 'Sem descrição' }}</p>
+                            <div class="token-url">
+                                <label>URL da Isca:</label>
+                                <input type="text" value="{{ request.host_url }}t/{{ token.id }}" readonly onclick="this.select()">
+                            </div>
+                            <div class="token-actions">
+                                <a href="/t/{{ token.id }}" target="_blank" class="btn-small">🔗 Testar</a>
+                                <form action="/delete/{{ token.id }}" method="POST" style="display:inline" onsubmit="return confirm('Tem certeza? Isso apagará todos os acessos registrados também.')">
+                                    <button type="submit" class="btn-small btn-danger">🗑️ Deletar</button>
+                                </form>
+                            </div>
+                            <small class="created-at">Criado em: {{ token.created_at[:19] }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">Nenhum token criado ainda. Crie sua primeira isca acima! 🎣</p>
+            {% endif %}
+        </section>
+    </div>
+</body>
+</html>
