@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Dashboard - Honey Token Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stat-card.triggered { border-left: 4px solid #ff6b6b; }
+        .stat-card.safe { border-left: 4px solid #51cf66; }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        .access-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .access-table th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.85em;
+        }
+        .access-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.85em;
+        }
+        .access-table tr:hover { background: #f8f9fa; }
+        .no-accesses {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+            font-size: 1.2em;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+        .badge-desktop { background: #dbeafe; color: #1e40af; }
+        .badge-mobile { background: #fef3c7; color: #92400e; }
+        .badge-tablet { background: #e0e7ff; color: #4338ca; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Dashboard de Intrusão</h1>
+            <nav>
+                <a href="/" class="btn">⬅️ Voltar</a>
+            </nav>
+        </header>
+
+        <div class="stats-grid">
+            {% for stat in token_stats %}
+                <div class="stat-card {% if stat.count > 0 %}triggered{% else %}safe{% endif %}">
+                    <h3>🍯 {{ stat.token.name }}</h3>
+                    <div class="stat-number">{{ stat.count }}</div>
+                    <p>acessos registrados</p>
+                    {% if stat.last_access %}
+                        <small style="color: #666;">
+                            Último: {{ stat.last_access.timestamp[:19] }}<br>
+                            IP: {{ stat.last_access.ip }}<br>
+                            {{ stat.last_access.browser }} • {{ stat.last_access.os }}
+                        </small>
+                    {% else %}
+                        <small style="color: #999;">Nenhum acesso ainda</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <h2>📜 Registro de Acessos Recentes</h2>
+        {% if accesses %}
+            <div style="overflow-x: auto;">
+                <table class="access-table">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Data/Hora</th>
+                            <th>IP</th>
+                            <th>Dispositivo</th>
+                            <th>Navegador</th>
+                            <th>SO</th>
+                            <th>Origem</th>
+                            <th>Idioma</th>
+                            <th>Resolução</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for access in accesses %}
+                            <tr>
+                                <td><strong>{{ access.token_name }}</strong></td>
+                                <td>{{ access.timestamp[:19] }}</td>
+                                <td>{{ access.ip }}</td>
+                                <td>
+                                    <span class="badge badge-{{ access.device.lower() }}">
+                                        {{ access.device }}
+                                    </span>
+                                </td>
+                                <td>{{ access.browser }}</td>
+                                <td>{{ access.os }}</td>
+                                <td>{{ access.referer[:30] if access.referer|length > 30 else access.referer }}</td>
+                                <td>{{ access.language[:20] }}</td>
+                                <td>{{ access.screen_resolution }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="no-accesses">
+                <p>🍯 Nenhuma isca foi mordida ainda...</p>
+                <p style="font-size: 0.9em;">Compartilhe os links dos tokens e aguarde!</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
